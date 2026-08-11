@@ -34,10 +34,33 @@ export default function RoastResult() {
   const state = location.state as RoastLocationState | null;
   const isDemoRequest = Boolean(state?.demo);
 
-  const [data, setData] = useState<RoastData | null>(null);
-  const [isDemo, setIsDemo] = useState(isDemoRequest);
+  const [data, setData] = useState<RoastData | null>(() => {
+    if (state?.demo) {
+      const demo = generateRoast("octocat", "brutal");
+      saveRoast({ data: demo, demo: true });
+      return demo;
+    }
+    if (state?.data) {
+      saveRoast({ data: state.data, demo: false });
+      return state.data;
+    }
+    const saved = loadRoast();
+    if (saved) {
+      return saved.data;
+    }
+    return null;
+  });
+
+  const [isDemo, setIsDemo] = useState<boolean>(() => {
+    if (state?.demo) return true;
+    if (state?.data) return false;
+    const saved = loadRoast();
+    if (saved) return saved.demo;
+    return isDemoRequest;
+  });
 
   useEffect(() => {
+    // State is already initialized correctly on mount, but if location.state changes later:
     if (state?.demo) {
       const demo = generateRoast("octocat", "brutal");
       setData(demo);
@@ -56,7 +79,7 @@ export default function RoastResult() {
       setData(saved.data);
       setIsDemo(saved.demo);
     }
-  }, [location.state]);
+  }, [state]);
 
   if (isLoading) {
     return (
@@ -111,12 +134,12 @@ export default function RoastResult() {
             <div className="mt-6 flex items-center justify-center gap-4">
               <Avatar
                 username={data.username}
-                avatarUrl={showRealAvatar}
+                avatarUrl={data.profile.avatar || showRealAvatar}
                 className="size-14"
               />
               <div className="text-left">
                 <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-                  @{data.username}
+                  {data.profile.displayName || `@${data.username}`}
                 </h1>
                 <p className="mt-1 flex items-center gap-2 font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
                   Mode:{" "}
@@ -131,6 +154,11 @@ export default function RoastResult() {
                     change
                   </button>
                 </p>
+                {data.profile.bio && (
+                  <p className="mt-2 text-sm text-muted-foreground max-w-md">
+                    {data.profile.bio}
+                  </p>
+                )}
               </div>
             </div>
 

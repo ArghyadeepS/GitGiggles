@@ -77,6 +77,8 @@ export interface GitHubStats {
   forks: number;
   commits: number;
   contributions: number;
+  followers: number;
+  following: number;
 }
 
 export interface TimelineEvent {
@@ -94,6 +96,13 @@ export interface RoastData {
   personality: {
     title: string;
     description: string;
+  };
+  profile: {
+    avatar: string | null;
+    displayName: string | null;
+    bio: string | null;
+    followers: number;
+    following: number;
   };
   stats: RoastStats;
   githubStats: GitHubStats;
@@ -453,6 +462,13 @@ export function generateRoast(
       roastScore >= 90 ? "Certified Menace" : roastScore >= 80 ? "Repeat Offender" : roastScore >= 65 ? "Suspect" : "Minor Offense",
     subtitle: SUBTITLES[mode],
     personality: PERSONALITIES[mode],
+    profile: {
+      avatar: null,
+      displayName: null,
+      bio: null,
+      followers: 420,
+      following: 69,
+    },
     stats: {
       projectsStarted: DEFAULT_PROFILE.repos,
       projectsFinished: DEFAULT_PROFILE.active,
@@ -471,6 +487,8 @@ export function generateRoast(
       forks: DEFAULT_PROFILE.forks,
       commits: DEFAULT_PROFILE.commits,
       contributions: DEFAULT_PROFILE.contributions,
+      followers: 420,
+      following: 69,
     },
     crimes,
     technologies,
@@ -508,4 +526,295 @@ export function loadRoast(): SavedRoast | null {
   } catch {
     return null;
   }
+}
+
+/* ── Backend API → RoastData Adapter ─────────────────────────
+   Maps the real backend AnalysisResponse + RoastResponse into
+   the RoastData shape that all UI components already consume.
+   ───────────────────────────────────────────────────────────── */
+
+import type { AnalysisResponse, RoastResponse } from "@/lib/api";
+
+/**
+ * Build a full RoastData object from real backend API responses.
+ * The UI components (RoastScore, PersonalityCard, CrimeCard, etc.)
+ * are never changed — this adapter is the single translation point.
+ */
+export function buildRoastDataFromAPI(
+  analysis: AnalysisResponse,
+  roast: RoastResponse,
+  mode: RoastMode,
+): RoastData {
+  const profile = analysis.profile;
+  const stats = analysis.statistics;
+  const repos = analysis.repositories;
+  const commits = analysis.commits;
+  const contributions = analysis.contributions;
+
+  const username = profile.username;
+  const totalRepos = profile.public_repositories;
+  const forkedCount = repos.filter((r) => r.forked).length;
+  const ownRepos = repos.filter((r) => !r.forked);
+  const archivedCount = repos.filter((r) => r.archived).length;
+  const activeCount = Math.max(1, totalRepos - archivedCount - forkedCount);
+  const totalCommits = commits.reduce((sum, c) => sum + c.commits, 0);
+
+  // ── Roast score: heuristic based on real stats ──
+  const seed = hashSeed(`${username.toLowerCase()}:${mode}`);
+  const rand = mulberry32(seed);
+
+  const abandonRatio = totalRepos > 0 ? (totalRepos - activeCount) / totalRepos : 0;
+  const starsPerRepo = totalRepos > 0 ? stats.total_stars / totalRepos : 0;
+  const commitsPerRepo = ownRepos.length > 0 ? totalCommits / ownRepos.length : 0;
+
+  // Higher score = more "roastable" (chaotic profile)
+  let rawScore = 50;
+  rawScore += abandonRatio * 30;                    // many abandoned → high score
+  rawScore -= Math.min(starsPerRepo, 10) * 1.5;    // many stars → lower score
+  rawScore -= Math.min(commitsPerRepo / 10, 15);   // high commit depth → lower
+  rawScore += Math.min(totalRepos / 5, 10);         // lots of repos → slightly higher
+
+  const modeBias: Record<RoastMode, number> = { brutal: 8, hacker: 12, friendly: -8, recruiter: -2 };
+  rawScore += modeBias[mode] + (rand() - 0.5) * 6;
+  const roastScore = clamp(Math.round(rawScore), 15, 99);
+
+  // ── GitHub stats ──
+  const githubStats: GitHubStats = {
+    repos: totalRepos,
+    active: activeCount,
+    stars: stats.total_stars,
+    forks: stats.total_forks,
+    commits: totalCommits,
+    contributions: contributions.total_contributions,
+    followers: profile.followers,
+    following: profile.following,
+  };
+
+  // ── Technologies from backend languages ──
+  const LANG_COLORS: Record<string, string> = {
+    Python: "#3572A5", JavaScript: "#f1e05a", TypeScript: "#3178c6",
+    "HTML/CSS": "#e34c26", Go: "#00ADD8", Rust: "#dea584",
+    Java: "#b07219", "C++": "#f34b7d", C: "#555555", Ruby: "#701516",
+    PHP: "#4F5D95", Swift: "#F05138", Kotlin: "#A97BFF", Dart: "#00B4AB",
+    Shell: "#89e051", "Jupyter Notebook": "#DA5B0B",
+  };
+  const NEO_COLORS = ["#ff4d00", "#ffc300", "#e63946", "#ff7a00", "#a855f7"];
+  const technologies: TechnologyDNA[] = analysis.languages.slice(0, 6).map((lang, i) => ({
+    name: lang.name,
+    value: clamp(Math.round((lang.score / (analysis.languages[0]?.score || 1)) * 95), 10, 99),
+    color: LANG_COLORS[lang.name] || NEO_COLORS[i % NEO_COLORS.length],
+  }));
+
+  // ── Developer style from real data ──
+  const noDescCount = repos.filter((r) => !r.description).length;
+  const descPct = repos.length > 0 ? Math.round(((repos.length - noDescCount) / repos.length) * 100) : 50;
+  const commitConsistency = commitsPerRepo > 20 ? 85 : commitsPerRepo > 5 ? 60 : 30;
+
+  const developerStyle: DeveloperStyle[] = [
+    { name: "Builder", value: clamp(Math.round(40 + (totalRepos / 2) + (totalCommits / 100)), 20, 99) },
+    { name: "Experimenter", value: clamp(Math.round(30 + analysis.languages.length * 8), 20, 99) },
+    { name: "Open Source", value: clamp(Math.round(20 + stats.total_stars * 2 + stats.total_forks * 3), 15, 99) },
+    { name: "Documentation", value: clamp(descPct, 10, 99) },
+    { name: "Consistency", value: clamp(commitConsistency, 10, 99) },
+  ];
+
+  // ── Personality from personas ──
+  const personaLabels = analysis.personas;
+  let personalityTitle = "The Generalist";
+  if (personaLabels.includes("Frontend")) personalityTitle = "The UI Artisan";
+  else if (personaLabels.includes("Backend")) personalityTitle = "The Backend Architect";
+  else if (personaLabels.includes("Machine Learning / AI")) personalityTitle = "The AI Alchemist";
+  else if (personaLabels.includes("DevOps / Cloud")) personalityTitle = "The Cloud Wrangler";
+  else if (personaLabels.includes("Mobile")) personalityTitle = "The Mobile Craftsperson";
+  else if (personaLabels.includes("Data Science / Data Engineering")) personalityTitle = "The Data Whisperer";
+
+  if (abandonRatio > 0.6) personalityTitle = "The Serial Starter";
+  if (totalRepos > 50 && commitsPerRepo < 5) personalityTitle = "The Idea Hoarder";
+
+  const personality = {
+    title: personalityTitle,
+    description: roast[mode], // use the AI roast text as the personality description
+  };
+
+  // ── Crimes: derived from real repo analysis patterns ──
+  const crimes: Crime[] = [];
+  let crimeId = 1;
+
+  if (totalRepos - activeCount > 3) {
+    crimes.push({
+      id: crimeId++,
+      category: "Project Graveyard",
+      evidence: `${totalRepos - activeCount} inactive repositories`,
+      roast: CRIME_POOL.find((c) => c.category === "Project Graveyard")?.roasts[mode] ||
+        "You start more projects than you finish.",
+      severity: clamp(Math.round(60 + abandonRatio * 35), 40, 99),
+    });
+  }
+
+  if (noDescCount > 3) {
+    crimes.push({
+      id: crimeId++,
+      category: "Documentation Crimes",
+      evidence: `${100 - descPct}% repos without descriptions`,
+      roast: CRIME_POOL.find((c) => c.category === "Documentation Crimes")?.roasts[mode] ||
+        "Your code speaks for itself. Unfortunately, nobody understands it.",
+      severity: clamp(Math.round(50 + (100 - descPct) * 0.4), 35, 95),
+    });
+  }
+
+  if (analysis.languages.length > 5) {
+    crimes.push({
+      id: crimeId++,
+      category: "Tech Stack Chaos",
+      evidence: `${analysis.languages.length} languages detected`,
+      roast: CRIME_POOL.find((c) => c.category === "Tech Stack Chaos")?.roasts[mode] ||
+        "You don't have a tech stack. You have commitment issues.",
+      severity: clamp(Math.round(55 + analysis.languages.length * 2.5), 40, 95),
+    });
+  }
+
+  const tempKeywords = ["test", "demo", "sample", "temp", "final", "draft", "hello", "practice", "copy"];
+  const tempRepos = repos.filter((r) => tempKeywords.some((kw) => r.name.toLowerCase().includes(kw)));
+  if (tempRepos.length > 1) {
+    crimes.push({
+      id: crimeId++,
+      category: "Naming Crimes",
+      evidence: `${tempRepos.length} repos named ${tempRepos.slice(0, 2).map((r) => r.name).join(", ")}`,
+      roast: CRIME_POOL.find((c) => c.category === "Naming Crimes")?.roasts[mode] ||
+        "Your version control strategy is adding 'final' to filenames.",
+      severity: clamp(Math.round(50 + tempRepos.length * 8), 35, 90),
+    });
+  }
+
+  if (forkedCount > 5) {
+    crimes.push({
+      id: crimeId++,
+      category: "Fork Addiction",
+      evidence: `${forkedCount} forked repositories`,
+      roast: mode === "brutal"
+        ? "You've forked more repos than you've committed to your own."
+        : mode === "friendly"
+          ? "You love exploring other people's code! Learning is wonderful."
+          : mode === "recruiter"
+            ? "Shows strong community engagement and code review habits."
+            : "We traced your forks. You clone repos, star them, and leave.",
+      severity: clamp(Math.round(40 + forkedCount * 3), 30, 85),
+    });
+  }
+
+  if (totalCommits > 500) {
+    crimes.push({
+      id: crimeId++,
+      category: "Commit Obsession",
+      evidence: `${totalCommits} total commits`,
+      roast: CRIME_POOL.find((c) => c.category === "Commit Crimes")?.roasts[mode] ||
+        "Your commit history is a novel.",
+      severity: clamp(Math.round(30 + Math.min(totalCommits / 50, 40)), 30, 80),
+    });
+  }
+
+  // Always ensure at least 3 crimes for the UI
+  if (crimes.length < 3) {
+    const fallbackCrimes = CRIME_POOL.filter((c) => !crimes.some((ec) => ec.category === c.category));
+    for (const fc of fallbackCrimes.slice(0, 3 - crimes.length)) {
+      crimes.push({
+        id: crimeId++,
+        category: fc.category,
+        evidence: fc.evidence,
+        roast: fc.roasts[mode],
+        severity: clamp(jitter(rand, fc.severity, 10), 30, 99),
+      });
+    }
+  }
+
+  crimes.sort((a, b) => b.severity - a.severity);
+  crimes.forEach((c, i) => (c.id = i + 1));
+
+  // ── Stats ──
+  const roastStats: RoastStats = {
+    projectsStarted: totalRepos,
+    projectsFinished: activeCount,
+    abandoned: totalRepos - activeCount,
+    techStackChaos: clamp(Math.round(analysis.languages.length * 8 + 10), 10, 99),
+    documentation: clamp(descPct, 5, 99),
+    commitObsession: clamp(Math.round(Math.min(totalCommits / 20, 95)), 10, 99),
+    completion: totalRepos > 0 ? clamp(Math.round((activeCount / totalRepos) * 100), 5, 99) : 50,
+  };
+
+  // ── Weekly commits from contribution calendar ──
+  const calendar = contributions.contribution_calendar;
+  const weeklyCommits: number[] = [];
+  if (calendar && typeof calendar === "object" && "weeks" in calendar) {
+    const weeks = (calendar as { weeks: Array<{ contributionDays: Array<{ contributionCount: number }> }> }).weeks;
+    const recentWeeks = weeks.slice(-12);
+    for (const week of recentWeeks) {
+      const total = week.contributionDays.reduce((s, d) => s + d.contributionCount, 0);
+      weeklyCommits.push(total);
+    }
+  }
+  // Pad to 12 weeks if needed
+  while (weeklyCommits.length < 12) {
+    weeklyCommits.unshift(Math.round(rand() * 10));
+  }
+
+  // ── Timeline from real data ──
+  const timeline: TimelineEvent[] = [];
+  if (stats.newest_repository) {
+    timeline.push({ icon: "rocket", label: "Latest project", detail: stats.newest_repository });
+  }
+  if (stats.most_starred_repository) {
+    timeline.push({ icon: "git", label: "Most starred", detail: `${stats.most_starred_repository} (${stats.total_stars} ⭐)` });
+  }
+  if (totalRepos - activeCount > 3) {
+    timeline.push({ icon: "archive", label: "Project graveyard", detail: `${totalRepos - activeCount} repos gathering dust` });
+  }
+  if (contributions.total_contributions > 100) {
+    timeline.push({ icon: "rocket", label: "Contribution streak", detail: `${contributions.total_contributions} contributions this year` });
+  }
+  if (timeline.length < 2) {
+    timeline.push({ icon: "warning", label: "Evidence collected", detail: `${totalRepos} repos analyzed` });
+  }
+
+  // ── Verdict ──
+  const verdict = VERDICTS[mode];
+
+  // ── Final roast ──
+  const finalRoast = roast[mode];
+
+  // ── Share text ──
+  const shareText =
+    `🔥 GitGiggles — @${username} scored ${roastScore}/100 (${MODE_LABELS[mode]} mode). ` +
+    `Personality: ${personality.title}. ` +
+    `${crimes[0]?.evidence ?? "Evidence found"}. ` +
+    `"${crimes[0]?.roast ?? "We have evidence."}" — can you handle the giggles?`;
+
+  return {
+    username,
+    mode,
+    roastScore,
+    roastLevelLabel:
+      roastScore >= 90 ? "Certified Menace" : roastScore >= 80 ? "Repeat Offender" : roastScore >= 65 ? "Suspect" : "Minor Offense",
+    subtitle: SUBTITLES[mode],
+    personality,
+    profile: {
+      avatar: profile.avatar,
+      displayName: profile.display_name,
+      bio: profile.bio,
+      followers: profile.followers,
+      following: profile.following,
+    },
+    stats: roastStats,
+    githubStats,
+    crimes,
+    technologies,
+    developerStyle,
+    summary:
+      `Analysis complete for @${username}: ${totalRepos} repositories, ` +
+      `${stats.total_stars} stars, ${totalCommits} commits across ${analysis.languages.length} languages.`,
+    verdict,
+    finalRoast,
+    weeklyCommits,
+    timeline,
+    shareText,
+  };
 }

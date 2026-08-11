@@ -4,10 +4,10 @@ import { AnimatedNumber } from "@/components/AnimatedNumber";
 
 const LABELS: { key: keyof GitHubStatsData; label: string }[] = [
   { key: "repos", label: "Repositories" },
-  { key: "active", label: "Active" },
   { key: "stars", label: "Stars" },
-  { key: "forks", label: "Forks" },
   { key: "commits", label: "Commits" },
+  { key: "followers", label: "Followers" },
+  { key: "following", label: "Following" },
   { key: "contributions", label: "Contributions" },
 ];
 

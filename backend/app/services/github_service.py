@@ -32,7 +32,7 @@ query($login: String!, $cursor: String, $userId: ID!) {
     isHireable
     createdAt
     updatedAt
-    repositories(first: 100, after: $cursor, ownerAffiliations: [OWNER], privacy: PUBLIC, orderBy: {field: STARGAZERS, direction: DESC}) {
+    repositories(first: 20, after: $cursor, ownerAffiliations: [OWNER], privacy: PUBLIC, orderBy: {field: STARGAZERS, direction: DESC}) {
       totalCount
       pageInfo {
         hasNextPage
