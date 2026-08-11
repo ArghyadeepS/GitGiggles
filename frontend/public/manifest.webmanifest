@@ -1,0 +1,17 @@
+{
+  "name": "GitGiggles — Roast My GitHub",
+  "short_name": "GitGiggles",
+  "description": "Your GitHub. Your crimes. Our giggles. Evidence-based developer roasts.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

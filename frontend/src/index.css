@@ -1,0 +1,217 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────────────────────────
+   THEME TOKENS — dark "Neobrutalism Minimalism"
+   Square corners · strong borders · flat color blocks · hard shadows
+   ───────────────────────────────────────────────────────────── */
+@theme inline {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+}
+
+/* Hard offset shadows — the neobrutalism signature */
+@utility neo-shadow {
+  box-shadow: 5px 5px 0 0 var(--neo);
+}
+@utility neo-shadow-sm {
+  box-shadow: 3px 3px 0 0 var(--neo);
+}
+@utility neo-shadow-yellow {
+  box-shadow: 5px 5px 0 0 var(--neo-yellow);
+}
+@utility neo-shadow-purple {
+  box-shadow: 5px 5px 0 0 var(--neo-purple);
+}
+@utility neo-shadow-fire {
+  box-shadow: 6px 6px 0 0 var(--neo-fire);
+}
+
+/* Subtle blueprint grid */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+/* Subtle film-grain noise */
+@utility bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* Fire gradient text */
+@utility text-fire {
+  background: linear-gradient(100deg, var(--neo-fire) 0%, var(--neo) 45%, var(--neo-yellow) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Glow behind fire elements */
+@utility glow-fire {
+  box-shadow:
+    0 0 24px rgb(255 77 0 / 0.35),
+    0 0 64px rgb(255 77 0 / 0.15);
+}
+
+:root {
+  /* Square corners — neobrutalism */
+  --radius: 0px;
+
+  --background: #050505;
+  --foreground: #f4f1ea;
+
+  --card: #111116;
+  --card-foreground: #f4f1ea;
+
+  --popover: #0b0b0f;
+  --popover-foreground: #f4f1ea;
+
+  --primary: #ff4d00;
+  --primary-foreground: #050505;
+
+  --secondary: #16161d;
+  --secondary-foreground: #f4f1ea;
+
+  --muted: #14141a;
+  --muted-foreground: #8b8b96;
+
+  --accent: #ffc300;
+  --accent-foreground: #050505;
+
+  --destructive: #e63946;
+  --border: rgb(255 255 255 / 0.16);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: #ff4d00;
+
+  --chart-1: #ff4d00;
+  --chart-2: #ffc300;
+  --chart-3: #8b5cf6;
+  --chart-4: #e63946;
+  --chart-5: #ff7a00;
+
+  --sidebar: #0b0b0f;
+  --sidebar-foreground: #f4f1ea;
+  --sidebar-primary: #ff4d00;
+  --sidebar-primary-foreground: #050505;
+  --sidebar-accent: #16161d;
+  --sidebar-accent-foreground: #f4f1ea;
+  --sidebar-border: rgb(255 255 255 / 0.12);
+  --sidebar-ring: #ff4d00;
+
+  /* Neobrutalism accent blocks */
+  --neo: #ff4d00;
+  --neo-fire: #e63946;
+  --neo-yellow: #ffc300;
+  --neo-purple: #8b5cf6;
+}
+
+.dark {
+  --background: #050505;
+  --foreground: #f4f1ea;
+  --card: #111116;
+  --card-foreground: #f4f1ea;
+  --popover: #0b0b0f;
+  --popover-foreground: #f4f1ea;
+  --primary: #ff4d00;
+  --primary-foreground: #050505;
+  --secondary: #16161d;
+  --secondary-foreground: #f4f1ea;
+  --muted: #14141a;
+  --muted-foreground: #8b8b96;
+  --accent: #ffc300;
+  --accent-foreground: #050505;
+  --destructive: #e63946;
+  --border: rgb(255 255 255 / 0.16);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: #ff4d00;
+  --chart-1: #ff4d00;
+  --chart-2: #ffc300;
+  --chart-3: #8b5cf6;
+  --chart-4: #e63946;
+  --chart-5: #ff7a00;
+  --sidebar: #0b0b0f;
+  --sidebar-foreground: #f4f1ea;
+  --sidebar-primary: #ff4d00;
+  --sidebar-primary-foreground: #050505;
+  --sidebar-accent: #16161d;
+  --sidebar-accent-foreground: #f4f1ea;
+  --sidebar-border: rgb(255 255 255 / 0.12);
+  --sidebar-ring: #ff4d00;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-color: #050505;
+  }
+  button:not([disabled]),
+  [role="button"]:not([disabled]) {
+    cursor: pointer;
+  }
+  ::selection {
+    background: var(--neo);
+    color: #050505;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #050505;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #26262e;
+    border: 2px solid #050505;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--neo);
+  }
+}
