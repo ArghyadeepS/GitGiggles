@@ -31,11 +31,15 @@ export function Navbar({ onRoast }: NavbarProps) {
   }, []);
 
   const handleRoast = () => {
+    console.log("[Navbar] 'Roast My GitHub' clicked. isAuthenticated:", isAuthenticated, "onRoast prop present:", Boolean(onRoast));
     if (isAuthenticated) {
+      console.log("[Navbar] User authenticated -> Navigating to /analyze");
       navigate("/analyze");
     } else if (onRoast) {
+      console.log("[Navbar] User not authenticated -> Calling onRoast()");
       onRoast();
     } else {
+      console.log("[Navbar] User not authenticated & no onRoast -> Navigating to /login");
       navigate("/login");
     }
   };
@@ -102,7 +106,7 @@ export function Navbar({ onRoast }: NavbarProps) {
             onClick={handleRoast}
             className="flex items-center gap-1.5 border-2 border-foreground bg-primary px-3 py-2 font-mono text-[11px] font-bold tracking-widest text-primary-foreground uppercase transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none neo-shadow-sm sm:px-4"
           >
-            {isAuthenticated ? "Roast My GitHub" : "Roast Me"}
+            Roast My GitHub
             <ArrowRight className="size-3.5" />
           </button>
         </div>

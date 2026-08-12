@@ -77,7 +77,7 @@ function readMockUser(): AuthUser | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(() => readMockUser());
+  const [user, setUser] = useState<AuthUser | null>(() => (firebaseConfigured ? null : readMockUser()));
   const [isLoading, setIsLoading] = useState(true);
   const isMock = !firebaseConfigured;
   const mockUserRef = useRef<AuthUser | null>(null);

@@ -47,7 +47,7 @@ export default function Login() {
             <ArrowLeft className="size-3.5" /> Back to the landing
           </Link>
 
-          <div className="border-2 border-white/20 bg-[#0b0b0f] p-8 shadow-[8px_8px_0_0_rgba(255,77,0,0.35)]">
+          <div className="rounded-2xl border border-white/10 bg-[#0b0b0f]/90 p-8 md:p-10 shadow-[0_0_50px_-12px_rgba(255,77,0,0.2)] hover:shadow-[0_0_60px_-6px_rgba(255,77,0,0.3)] hover:border-white/15 transition-all duration-500 backdrop-blur-md">
             <GithubLoginCard
               onSignedIn={() => {
                 const target =

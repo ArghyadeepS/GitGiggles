@@ -98,9 +98,12 @@ export function Hero({ onRoast }: { onRoast: () => void }) {
   const navigate = useNavigate();
 
   const handlePrimary = () => {
+    console.log("[Hero] Primary button clicked. isAuthenticated:", isAuthenticated);
     if (isAuthenticated) {
+      console.log("[Hero] Navigating to /analyze");
       navigate("/analyze");
     } else {
+      console.log("[Hero] Triggering onRoast()");
       onRoast();
     }
   };

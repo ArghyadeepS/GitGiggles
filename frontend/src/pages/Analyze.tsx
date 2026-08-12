@@ -21,7 +21,7 @@ const MODE_KEY = "gitgiggles:mode";
 type Phase = "setup" | "running" | "done" | "error";
 
 export default function Analyze() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const [phase, setPhase] = useState<Phase>("setup");
@@ -53,10 +53,18 @@ export default function Analyze() {
   const username = usernameInput.trim() || user?.username || "developer";
 
   const startInvestigation = () => {
+    console.log("[Analyze] 'Start the roast' clicked. isAuthenticated:", isAuthenticated, "usernameInput:", usernameInput);
+    if (!isAuthenticated) {
+      console.log("[Analyze] User not authenticated -> Navigating to /login");
+      navigate(`/login?returnTo=${encodeURIComponent("/analyze")}`);
+      return;
+    }
     if (!usernameInput.trim()) {
+      console.log("[Analyze] Empty username input!");
       setError("Enter a GitHub username to roast.");
       return;
     }
+    console.log("[Analyze] Starting investigation for:", usernameInput.trim());
     setError(null);
     localStorage.setItem(MODE_KEY, mode);
     setPhase("running");

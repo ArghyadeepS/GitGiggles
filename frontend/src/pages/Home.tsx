@@ -142,10 +142,15 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const openModal = () => setModalOpen(true);
+  const openModal = () => {
+    console.log("[Home] openModal called! Updating modalOpen state to true.");
+    setModalOpen(true);
+  };
 
   const handlePrimary = () => {
+    console.log("[Home] handlePrimary triggered. isAuthenticated:", isAuthenticated);
     if (isAuthenticated) {
+      console.log("[Home] Navigating to /analyze");
       navigate("/analyze");
     } else {
       openModal();
