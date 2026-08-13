@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/Logo";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 interface NavbarProps {
   /** Opens the auth modal instead of navigating (used on the landing page). */
@@ -50,8 +51,8 @@ export function Navbar({ onRoast }: NavbarProps) {
         className={cn(
           "mx-auto mt-3 flex max-w-6xl items-center justify-between gap-3 border-2 px-3 py-2.5 transition-all duration-300 sm:px-4",
           scrolled
-            ? "border-white/15 bg-[#0b0b0f]/95 shadow-[0_8px_30px_rgb(0_0_0/0.45)] backdrop-blur-xl"
-            : "border-white/10 bg-[#0b0b0f]/60 backdrop-blur-md",
+            ? "border-border bg-card/95 shadow-[0_8px_30px_rgb(0_0_0/0.15)] backdrop-blur-xl"
+            : "border-border bg-card/60 backdrop-blur-md"
         )}
       >
         <Link
@@ -92,6 +93,7 @@ export function Navbar({ onRoast }: NavbarProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <AnimatedThemeToggler className="border-2 border-transparent text-foreground transition-all hover:border-white/15" />
           <a
             href="https://github.com"
             target="_blank"

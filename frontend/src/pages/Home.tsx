@@ -166,7 +166,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen text-foreground">
       <Navbar onRoast={openModal} />
 
       <main>
@@ -303,7 +303,7 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.5 }}
-              className="mt-10 flex flex-col items-center gap-5 border-2 border-white/15 bg-[#0b0b0f] p-8 text-center"
+              className="mt-10 flex flex-col items-center gap-5 border-2 border-white/15 bg-card p-8 text-center"
             >
               <p className="max-w-xl text-lg leading-8 text-foreground/90 italic">
                 “{demo.finalRoast}”
@@ -337,7 +337,7 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.55 }}
-              className="mx-auto mt-12 max-w-3xl overflow-hidden border-2 border-white/20 bg-[#0b0b0f]"
+              className="mx-auto mt-12 max-w-3xl overflow-hidden border-2 border-white/20 bg-card"
             >
               <div className="grid grid-cols-[1fr_auto_1fr] border-b-2 border-white/10 font-mono text-xs font-bold tracking-widest uppercase">
                 <p className="px-5 py-4 text-center text-primary">You</p>

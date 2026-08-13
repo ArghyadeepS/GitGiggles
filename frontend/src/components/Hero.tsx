@@ -111,11 +111,11 @@ export function Hero({ onRoast }: { onRoast: () => void }) {
   return (
     <section className="relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28">
       {/* Background: fire glow + grid + noise */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 -z-0">
         <div className="absolute -top-40 left-1/2 h-[480px] w-[820px] -translate-x-1/2 rounded-full bg-primary/15 blur-[140px]" />
         <div className="absolute top-1/3 -right-40 h-[420px] w-[420px] rounded-full bg-[#e63946]/10 blur-[120px]" />
-        <div className="bg-grid absolute inset-0 opacity-70" />
-        <div className="bg-noise absolute inset-0" />
+        <div className="bg-grid absolute inset-0 opacity-45" />
+        <div className="bg-noise absolute inset-0 opacity-60" />
       </div>
 
       {/* Faint terminal texture */}
@@ -130,8 +130,7 @@ export function Hero({ onRoast }: { onRoast: () => void }) {
         <br />$ rm -rf self_esteem && cd ..
       </p>
 
-      <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 lg:grid-cols-2">
-        <div>
+          <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-16 px-6 lg:grid-cols-2">        <div>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

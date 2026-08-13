@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router";
 import { RequireAuth } from "@/components/RequireAuth";
+import { HalftoneTrail } from "@/components/ui/halftone-trail";
 
 // Lazy load route components for better code splitting
 const Home = lazy(() => import("./pages/Home.tsx"));
@@ -47,32 +48,54 @@ function RouteSyncer() {
 
 export default function App() {
   return (
-    <>
-      <RouteSyncer />
-      <Suspense fallback={<RouteLoading />}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/analyze"
-            element={
-              <RequireAuth>
-                <Analyze />
-              </RequireAuth>
-            }
-          />
-          <Route path="/roast" element={<RoastResult />} />
-          <Route
-            path="/catalog"
-            element={
-              <RequireAuth>
-                <Catalog />
-              </RequireAuth>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </>
+    <div className="relative min-h-screen">
+      {/* Global halftone */}
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <HalftoneTrail
+          cellSize={11}
+          decay={0.968}
+          brushSize={0.043}
+          hoverBrushSize={0.012}
+          opacity={0.9}
+          hoverOpacity={0.22}
+          speedScale={37}
+          color="var(--foreground)"
+        />
+      </div>
+
+      {/* Website */}
+      <div className="relative z-10">
+        <RouteSyncer />
+
+        <Suspense fallback={<RouteLoading />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+
+            <Route
+              path="/analyze"
+              element={
+                <RequireAuth>
+                  <Analyze />
+                </RequireAuth>
+              }
+            />
+
+            <Route path="/roast" element={<RoastResult />} />
+
+            <Route
+              path="/catalog"
+              element={
+                <RequireAuth>
+                  <Catalog />
+                </RequireAuth>
+              }
+            />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </div>
+    </div>
   );
 }
