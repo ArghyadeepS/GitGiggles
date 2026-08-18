@@ -128,7 +128,7 @@ export default function RoastResult() {
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <p className="inline-flex items-center gap-2 border-2 border-white/15 bg-card px-4 py-2 font-mono text-[11px] font-bold tracking-[0.25em] text-primary uppercase">
+            <p className="inline-flex items-center gap-2 border-2 border-white px-4 py-2 font-mono text-[11px] font-bold tracking-[0.25em] text-primary uppercase">
               <Flame className="size-4 fill-primary" /> Roast Report
             </p>
             <div className="mt-6 flex items-center justify-center gap-4">
@@ -143,7 +143,7 @@ export default function RoastResult() {
                 </h1>
                 <p className="mt-1 flex items-center gap-2 font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
                   Mode:{" "}
-                  <span className="border border-white/20 bg-muted px-2 py-0.5 font-bold text-accent">
+                  <span className="border border-border bg-muted px-2 py-0.5 font-bold text-accent">
                     {modeInfo.label}
                   </span>
                   <button

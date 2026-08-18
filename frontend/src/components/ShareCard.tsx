@@ -68,7 +68,7 @@ export function ShareCard({ data }: { data: RoastData }) {
         whileHover={{ rotate: 0.6 }}
         className="mx-auto mt-12 max-w-md"
       >
-        <div className="border-2 border-white/25 bg-[#0b0b0f] p-7 shadow-[10px_10px_0_0_rgba(255,77,0,0.35)]">
+        <div className="border-2 border-white/25 bg-card p-7 shadow-[10px_10px_0_0_rgba(255,77,0,0.35)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Logo className="size-8" />
@@ -136,14 +136,14 @@ export function ShareCard({ data }: { data: RoastData }) {
         <button
           type="button"
           onClick={handleShare}
-          className="flex flex-1 items-center justify-center gap-2 border-2 border-foreground bg-foreground px-5 py-3 font-mono text-xs font-bold tracking-widest text-background uppercase transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-white hover:shadow-none neo-shadow-sm"
+          className="flex flex-1 items-center justify-center gap-2 border-2 border-foreground bg-foreground px-5 py-3 font-mono text-xs font-bold tracking-widest text-background uppercase transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none neo-shadow-sm"
         >
           <Share2 className="size-4" /> Share
         </button>
         <button
           type="button"
           onClick={() => navigate("/analyze")}
-          className="flex flex-1 items-center justify-center gap-2 border-2 border-white/20 bg-transparent px-5 py-3 font-mono text-xs font-bold tracking-widest text-foreground uppercase transition-all hover:border-foreground hover:bg-card"
+          className="flex flex-1 items-center justify-center gap-2 border-2 border-white bg-transparent px-5 py-3 font-mono text-xs font-bold tracking-widest text-foreground uppercase transition-all hover:border-foreground hover:bg-card"
         >
           <RefreshCw className="size-4" /> Roast Again
         </button>

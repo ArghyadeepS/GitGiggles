@@ -41,7 +41,7 @@ export function FinalVerdict({ data }: { data: RoastData }) {
           aria-hidden="true"
           className="glow-fire pointer-events-none absolute -inset-8 -z-10 rounded-full bg-primary/10 blur-[80px]"
         />
-        <div className="border-2 border-white/25 bg-[#050505] p-8 font-mono sm:p-10">
+        <div className="border-2 border-white/25 bg-card p-8 font-mono sm:p-10">
           <div className="flex items-center justify-between border-b-2 border-white/10 pb-4">
             <span className="text-[11px] tracking-[0.25em] text-muted-foreground uppercase">
               verdict.txt

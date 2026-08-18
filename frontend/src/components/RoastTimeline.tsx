@@ -61,7 +61,7 @@ export function RoastTimeline({ data }: { data: RoastData }) {
                       : "w-full bg-gradient-to-t from-primary/50 to-primary"
                   }
                 />
-                <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 border border-white/15 bg-[#0b0b0f] px-1.5 py-0.5 font-mono text-[9px] whitespace-nowrap text-foreground opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 border border-white/15 bg-card px-1.5 py-0.5 font-mono text-[9px] whitespace-nowrap text-foreground opacity-0 transition-opacity group-hover:opacity-100">
                   {count} commits
                 </span>
               </div>

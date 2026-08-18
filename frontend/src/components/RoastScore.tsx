@@ -5,7 +5,7 @@ import { AnimatedNumber } from "@/components/AnimatedNumber";
 
 export function RoastScore({ data }: { data: RoastData }) {
   return (
-    <section className="relative overflow-hidden border-2 border-white/15 bg-[#0b0b0f] p-8 sm:p-12">
+    <section className="relative overflow-hidden border-2 border-black/15 bg-card p-8 sm:p-12">
       <div
         aria-hidden="true"
         className="glow-fire pointer-events-none absolute -top-24 left-1/2 h-[260px] w-[480px] -translate-x-1/2 rounded-full bg-primary/15 blur-[90px]"
